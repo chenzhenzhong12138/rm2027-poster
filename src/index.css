@@ -221,17 +221,20 @@ body {
   gap: 8px;
 }
 
-.tech-name-flow {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 24px;
+.tech-grade[data-gradeline="大三"] .tech-name-grid {
+  column-gap: 12px;
 }
 
 .tech-name {
   display: flex;
   align-items: center;
+  justify-content: center;
   min-width: 0;
   height: 36px;
+  padding: 0 7px;
+  border: 1px solid var(--color-edge);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .035);
   white-space: nowrap;
   font-size: 20px;
   line-height: 28px;
@@ -240,7 +243,11 @@ body {
   color: var(--color-ink);
 }
 
-.tech-grade[data-gradeline="大三"] .tech-name { font-weight: 600; }
+.tech-grade[data-gradeline="大三"] .tech-name {
+  font-weight: 600;
+  border-color: var(--color-edge-strong);
+  background: rgba(255, 255, 255, .065);
+}
 
 .tech-card-support .tech-card-body {
   grid-template-columns: repeat(2, minmax(0, 1fr));

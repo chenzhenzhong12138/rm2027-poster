@@ -6,12 +6,12 @@ import { PosterHeader } from "./PosterHeader";
 
 const areas = ["mechanical", "embedded", "algorithm", "support"];
 
-function GradeRow({ grade, names, columns, flow = false }: { grade: string; names: string[]; columns: number; flow?: boolean }) {
+function GradeRow({ grade, names, columns }: { grade: string; names: string[]; columns: number }) {
     if (!names.length) return null;
     return (
         <div className="tech-grade" data-gradeline={grade}>
             <span className="tech-grade-label">{grade}</span>
-            <div className={`tech-name-grid ${flow ? "tech-name-flow" : ""}`} data-chips style={flow ? undefined : { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+            <div className="tech-name-grid" data-chips style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
                 {names.map(name => <span className="tech-name" data-chip key={name}>{name}</span>)}
             </div>
         </div>
@@ -34,7 +34,7 @@ function SubBlock({ sub, group, compact, embedded }: {
                 </>}
             </div>
             <div className="tech-sub-grades">
-                <GradeRow grade="大三" names={sub.g3} columns={2} flow={!compact} />
+                <GradeRow grade="大三" names={sub.g3} columns={compact ? 2 : embedded ? 5 : group.subs.length === 1 ? 4 : 3} />
                 <GradeRow grade="大二" names={sub.g2} columns={compact ? 2 : embedded ? 4 : 3} />
             </div>
         </div>
