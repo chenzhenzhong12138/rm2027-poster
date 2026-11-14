@@ -131,10 +131,10 @@ export function parseTech(raw: unknown, file = "tech.json"): TechData {
   return { groups };
 }
 
-/** 各卡「编制 大三 + 大二」= 名额数（含跨组兼任重复计） */
+/** 各卡实际人数：同一人在本组的多个子组兼任时计一次。 */
 export const countGroup = (g: TechGroup) => ({
-  g3: g.subs.reduce((a, s) => a + s.g3.length, 0),
-  g2: g.subs.reduce((a, s) => a + s.g2.length, 0),
+  g3: unique(g.subs.flatMap((s) => s.g3)).length,
+  g2: unique(g.subs.flatMap((s) => s.g2)).length,
 });
 
 /** 表头总数 = 去重后人数；shared = 出现两次以上的人 */

@@ -68,9 +68,6 @@
   --gap-band: 30px; /* 页眉 → 内容带的固定间距（两页一致） */
   --gap-card: 18px; /* 卡片之间的缝 */
   --gap-cell: 2px; /* 矩阵的细缝 */
-  --band-title: 26px; /* 技术组：子组标题行带 */
-  --band-g3: 100px; /* 技术组：大三行带（容 2 行胶囊） */
-  --band-g2: 154px; /* 技术组：大二行带（容 3 行胶囊） */
 }
 
 /* ---------- 页面外壳（不参与海报导出：只有 stage 里的内容算海报） ---------- */
@@ -122,4 +119,73 @@ body {
   bottom: 3px;
   width: 3px;
   border-radius: var(--radius-bar);
+}
+
+/* 第一页：双子组上下等分，年级行按真实名单高度排版，不挤占相邻子组。 */
+.tech-card-head {
+  flex: 0 0 88px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-hair);
+}
+
+.tech-card-body {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  gap: 24px;
+  padding: 20px 18px;
+}
+
+.tech-sub {
+  min-height: 0;
+}
+
+.tech-sub + .tech-sub {
+  position: relative;
+}
+
+.tech-sub + .tech-sub::before {
+  position: absolute;
+  content: "";
+  top: -12px;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-hair);
+}
+
+.tech-sub-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  margin-bottom: 12px;
+}
+
+.tech-sub-grades {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tech-grade {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.tech-grade-label {
+  display: flex;
+  flex: 0 0 42px;
+  align-items: center;
+  height: 45.2px;
+}
+
+.tech-sub-single {
+  display: flex;
+  align-items: center;
+}
+
+.tech-sub-single .tech-sub-grades {
+  width: 100%;
+  gap: 44px;
 }
