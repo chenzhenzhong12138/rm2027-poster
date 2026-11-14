@@ -24,7 +24,9 @@
 
 | 技术组名单 | 车组名单 |
 | --- | --- |
-| ![技术组名单](shots/tech-1920x1080.png) | ![车组名单](shots/cars-1920x1080.png) |
+| ![技术组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/133a00796bf748cd91147a8b56da39f21b9f9874/shots/tech-1920x1080.png) | ![车组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/133a00796bf748cd91147a8b56da39f21b9f9874/shots/cars-1920x1080.png) |
+
+<!-- 预览图使用固定提交链接，避免同名文件的旧缓存；更新 shots/ 后须同步刷新以上提交号。 -->
 
 （两页截图均已更新。预览入口为 `?page=tech&auto=0` / `?page=cars&auto=0`。）
 
