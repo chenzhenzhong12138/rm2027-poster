@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import type { CarStats, CarsData } from "../data/roster";
 import { CONTENT_W } from "../lib/util";
-import { carCellRuns } from "../lib/car-cells";
+import { carCellRuns, carWorkRuns } from "../lib/car-cells";
 import { AccentLabel, Block, PersonCell } from "./blocks";
 import { Countdown } from "./Countdown";
 import { PosterFooter } from "./PosterFooter";
@@ -160,8 +160,22 @@ export function CarMatrix({ data, stats }: { data: CarsData; stats: CarStats }) 
                       >
                         <AccentLabel accent={disc.accent}>{disc.name}</AccentLabel>
                       </Block>
-                      {carCellRuns(robots, robot => robot.crew[grade]?.[disc.name] ?? []).map(run => (
-                          <PersonCell
+                      {carWorkRuns(robots, grade, disc.name).map(run => run.rowSpan > 1 ? (
+                        <div
+                          key={`${grade}-${disc.name}-${run.start}`}
+                          data-cell
+                          data-joint-work={run.work}
+                          data-names={run.names.join("、")}
+                          className="car-joint-cell"
+                          style={{ gridColumn: `${run.start + 3} / span ${run.span}`, gridRow: `${rowIndex} / span ${run.rowSpan}` }}
+                        >
+                          <span className="car-joint-label">硬件＋电控</span>
+                          <div className="car-joint-names" style={{ gridTemplateColumns: run.span > 1 ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)" }}>
+                            {run.names.map(name => <span key={name}>{name}</span>)}
+                          </div>
+                        </div>
+                      ) : (
+                        <PersonCell
                             key={`${grade}-${disc.name}-${run.start}`}
                             names={run.names}
                             accent={disc.accent}

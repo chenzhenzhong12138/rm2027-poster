@@ -83,7 +83,7 @@ function addCarPerson(name, grade, role) {
 for (const robot of cars.robots) {
   for (const [grade, disciplines] of Object.entries(robot.crew)) {
     for (const [discipline, names] of Object.entries(disciplines)) {
-      for (const name of names) addCarPerson(name, gradeLabels[grade] ?? grade, `${robot.name}／${discipline}`);
+      for (const name of names) addCarPerson(name, gradeLabels[grade] ?? grade, `${robot.name}／${discipline.replaceAll("+", "＋")}`);
     }
   }
 }
@@ -96,7 +96,7 @@ const extra = [...carPeople.values()].filter(person => !people.has(person.name))
 const shared = [...people.keys()].filter(name => carPeople.has(name)).length;
 const comparison = [
   "# RM2027 第二页名单对照", "",
-  `第二页现有 **${carPeople.size} 人、${assignments} 人次、${cars.robots.length} 个车组**。人次按每台车的工作与负责人任务累计，合并显示不减少人次。`, "",
+  `第二页现有 **${carPeople.size} 人、${assignments} 人次、${cars.robots.length} 个车组**。人次按每台车的工作与负责人任务累计；硬件＋电控为一项联合任务，每人每车计一次。跨车共享任务仍分别统计。`, "",
   `第一页 ${people.size} 人，两页共有 ${shared} 人；第一页独有 ${missing.length} 人，第二页独有 ${extra.length} 人。`, "",
   `## 第一页有、第二页尚未出现的 ${missing.length} 人`, "",
   "| 姓名 | 年级 | 第一页所属组别 |", "| --- | --- | --- |",

@@ -7,7 +7,7 @@
  * 这里只做三件事：类型定义、JSON 校验（出错时报清楚是哪个文件哪个字段）、
  * 由数据实时派生统计口径（页眉人数、人次、跨组兼任等，全部算出来，JSON 里不写死数字）。
  */
-import { unique } from "../lib/util";
+import { unique } from "../lib/util.ts";
 
 /* ---------- 类型 ---------- */
 
@@ -54,7 +54,7 @@ export interface Robot {
   group?: string;
   /** 该车负责人（可多人） */
   lead: string[];
-  /** 按年级分块的人员名单：{ "2024级": { "机械": ["张三"] } } */
+  /** 按年级分块；硬件+电控为单项联合任务，不能与单独硬件或电控重复。 */
   crew: Record<string, Record<string, string[]>>;
 }
 
@@ -71,7 +71,7 @@ export interface CarsData {
 export interface CarStats {
   /** 去重后参与车组的人数（含负责人） */
   unique: number;
-  /** 全部人次 = 所有格子里的人数之和（同一人管多台车会重复计） */
+  /** 按每车工作任务与负责人累计；联合任务每人每车一次，不按展示格数计。 */
   slots: number;
   /** 各年级人数（去重，不含负责人） */
   byGrade: Record<string, number>;
@@ -189,18 +189,22 @@ export function parseCars(raw: unknown, file = "cars.json"): CarsData {
       if (byDiscRaw === undefined) continue;
       const byDisc = obj(byDiscRaw, file, `${at}.crew.${g}`);
       const ordered: Record<string, string[]> = {};
-      for (const d of discNames) {
-        if (byDisc[d] === undefined) continue;
-        ordered[d] = names(byDisc[d], file, `${at}.crew.${g}.${d}`);
-      }
+      const occupied = new Set<string>();
       for (const key of Object.keys(byDisc)) {
-        if (!discNames.includes(key)) {
+        const parts = key === "硬件+电控" ? ["硬件", "电控"] : [key];
+        if (!parts.every(part => discNames.includes(part)) ||
+          (parts.length > 1 && discNames.indexOf("电控") !== discNames.indexOf("硬件") + 1)) {
           bad(
             file,
             `${at}.crew.${g}.${key}`,
-            `工作不在 disciplines 里（可用：${discNames.join(" / ")}）`,
+            `工作不在 disciplines 里或联合任务行不相邻（可用：${discNames.join(" / ")}，以及相邻的硬件+电控）`,
           );
         }
+        for (const part of parts) {
+          if (occupied.has(part)) bad(file, `${at}.crew.${g}.${key}`, `${part} 与其他任务重复覆盖`);
+          occupied.add(part);
+        }
+        ordered[key] = names(byDisc[key], file, `${at}.crew.${g}.${key}`);
       }
       crew[g] = ordered;
     }
