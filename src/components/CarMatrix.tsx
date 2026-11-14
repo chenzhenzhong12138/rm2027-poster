@@ -169,7 +169,6 @@ export function CarMatrix({ data, stats }: { data: CarsData; stats: CarStats }) 
                           className="car-joint-cell"
                           style={{ gridColumn: `${run.start + 3} / span ${run.span}`, gridRow: `${rowIndex} / span ${run.rowSpan}` }}
                         >
-                          <span className="car-joint-label">硬件＋电控</span>
                           <div className="car-joint-names" style={{ gridTemplateColumns: run.span > 1 ? "repeat(2, minmax(0, 1fr))" : "minmax(0, 1fr)" }}>
                             {run.names.map(name => <span key={name}>{name}</span>)}
                           </div>
