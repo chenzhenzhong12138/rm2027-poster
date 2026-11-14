@@ -1,31 +1,28 @@
 import { countGroup, type TechData, type TechGroup, type TechStats, type TechSub } from "../data/roster";
-import { AccentLabel, ChipRows } from "./blocks";
+import { AccentLabel } from "./blocks";
 import { Countdown } from "./Countdown";
 import { PosterFooter } from "./PosterFooter";
 import { PosterHeader } from "./PosterHeader";
 
-/** 卡宽减去描边、内边距、年级标签和标签间距。 */
-const chipsBoxWidth = (cardWidth: number) => cardWidth - 90;
+const areas = ["mechanical", "embedded", "algorithm", "support"];
 
-function ChipLine({ grade, names, strong, boxWidth }: {
-    grade: string;
-    names: string[];
-    strong: boolean;
-    boxWidth: number;
-}) {
+function GradeRow({ grade, names, columns, flow = false }: { grade: string; names: string[]; columns: number; flow?: boolean }) {
     if (!names.length) return null;
     return (
         <div className="tech-grade" data-gradeline={grade}>
-            <span className="tech-grade-label text-meta font-medium tracking-[1px] text-dim">{grade}</span>
-            <ChipRows names={names} strong={strong} boxWidth={boxWidth} />
+            <span className="tech-grade-label">{grade}</span>
+            <div className={`tech-name-grid ${flow ? "tech-name-flow" : ""}`} data-chips style={flow ? undefined : { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
+                {names.map(name => <span className="tech-name" data-chip key={name}>{name}</span>)}
+            </div>
         </div>
     );
 }
 
-function SubBlock({ sub, group, boxWidth }: {
+function SubBlock({ sub, group, compact, embedded }: {
     sub: TechSub;
     group: TechGroup;
-    boxWidth: number;
+    compact: boolean;
+    embedded: boolean;
 }) {
     const single = group.subs.length === 1 && sub.name === group.name;
     return (
@@ -33,37 +30,31 @@ function SubBlock({ sub, group, boxWidth }: {
             <div className="tech-sub-title" aria-hidden={single || undefined}>
                 {!single && <>
                     <AccentLabel accent={group.accent}>{sub.name}</AccentLabel>
-                    <span className="text-meta tracking-[0.5px] text-dim">{sub.g3.length + sub.g2.length} 人</span>
+                    <span className="tech-sub-count">{sub.g3.length + sub.g2.length} 人</span>
                 </>}
             </div>
             <div className="tech-sub-grades">
-                <ChipLine grade="大三" names={sub.g3} strong boxWidth={boxWidth} />
-                <ChipLine grade="大二" names={sub.g2} strong={false} boxWidth={boxWidth} />
+                <GradeRow grade="大三" names={sub.g3} columns={2} flow={!compact} />
+                <GradeRow grade="大二" names={sub.g2} columns={compact ? 2 : embedded ? 4 : 3} />
             </div>
         </div>
     );
 }
 
-function TechCard({ group }: { group: TechGroup }) {
+function TechCard({ group, index }: { group: TechGroup; index: number }) {
     const { g3, g2 } = countGroup(group);
-    const boxWidth = chipsBoxWidth(group.width);
+    const compact = index === 3;
     return (
-        <section
-            data-card
-            className="tech-card relative flex min-w-0 flex-col overflow-hidden rounded-card border bg-[linear-gradient(180deg,var(--color-card-top)_0%,var(--color-card-bottom)_100%)] shadow-[0_14px_34px_rgba(0,0,0,.38)]"
-            style={{ flex: `0 0 ${group.width}px`, borderColor: group.border }}
-        >
+        <section data-card className={`tech-card ${compact ? "tech-card-support" : ""}`} style={{ gridArea: areas[index], borderColor: group.border }}>
             <header className="tech-card-head" style={{ background: group.accent }}>
-                <div className="flex items-center justify-between gap-[12px] leading-[1.1]">
-                    <span className="text-cardtitle font-bold tracking-[3px] text-white">{group.name}</span>
-                    <span className="whitespace-nowrap text-cardtitle font-bold text-white" data-group-total>
-                        {g3 + g2}<span className="ml-[5px] text-meta font-medium">人</span>
-                    </span>
+                <div className="tech-card-heading">
+                    <span className="tech-card-title">{group.name}</span>
+                    <span className="tech-card-total" data-group-total>{g3 + g2}<span>人</span></span>
                 </div>
-                <div className="mt-[6px] text-meta leading-[1.25] tracking-[1px] text-white/85">大三 {g3} · 大二 {g2}</div>
+                <div className="tech-card-note">大三 {g3} · 大二 {g2}</div>
             </header>
-            <div className="tech-card-body" style={{ gridTemplateRows: `repeat(${group.subs.length}, minmax(0, 1fr))` }}>
-                {group.subs.map(sub => <SubBlock key={sub.name} sub={sub} group={group} boxWidth={boxWidth} />)}
+            <div className="tech-card-body" style={compact ? undefined : { gridTemplateRows: `repeat(${group.subs.length}, minmax(0, 1fr))` }}>
+                {group.subs.map(sub => <SubBlock key={sub.name} sub={sub} group={group} compact={compact} embedded={index === 1} />)}
             </div>
         </section>
     );
@@ -84,8 +75,8 @@ export function TechRoster({ data, stats }: { data: TechData; stats: TechStats }
                 stats={{ value: String(stats.total), unit: "人", note: `大三 ${stats.g3} · 大二 ${stats.g2}` }}
             />
             <Countdown />
-            <main className="relative z-[1] mt-[var(--gap-band)] flex h-[var(--band-h)] items-stretch gap-[var(--gap-card)]">
-                {data.groups.map(group => <TechCard key={group.name} group={group} />)}
+            <main className="tech-roster" style={{ gridTemplateColumns: data.groups.slice(0, 3).map(group => `${group.width}px`).join(" ") }}>
+                {data.groups.map((group, index) => <TechCard key={group.name} group={group} index={index} />)}
             </main>
             <PosterFooter />
         </>

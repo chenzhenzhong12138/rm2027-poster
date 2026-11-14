@@ -110,6 +110,16 @@ export function Diag() {
       });
       if (cards.length) lines.push(`子组溢出: ${subOverflow.length ? subOverflow.join(" | ") : "OK 无溢出"}`);
 
+      const gradeGaps = [...stage.querySelectorAll<HTMLElement>("[data-sub]")].flatMap(sub => {
+        const seniors = [...sub.querySelectorAll<HTMLElement>('[data-gradeline="大三"] [data-chip]')];
+        const junior = sub.querySelector<HTMLElement>('[data-gradeline="大二"] [data-chip]');
+        if (!seniors.length || !junior) return [];
+        const bottom = Math.max(...seniors.map(name => name.getBoundingClientRect().bottom));
+        const gap = (junior.getBoundingClientRect().top - bottom) / (sb.width / STAGE_W);
+        return [`${sub.dataset.sub} ${gap.toFixed(1)}px${Math.abs(gap - 24) > 0.5 ? " 异常" : ""}`];
+      });
+      if (gradeGaps.length) lines.push(`年级净间距: ${gradeGaps.join(" | ")}`);
+
       // 技术组：年级行位置（按实际名单高度排列，不要求跨卡同 y）。
       const gradeLines = [...stage.querySelectorAll<HTMLElement>("[data-gradeline]")].map(
         (el) => {
