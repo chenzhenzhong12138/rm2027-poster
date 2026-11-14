@@ -25,7 +25,7 @@ const lines = [
   "",
   `共 **${people.size} 人**：大三 **${gradeCount("大三")} 人**，大二 **${gradeCount("大二")} 人**。`,
   "",
-  "人数按统计范围内的实际人员计算；跨组兼任会在相应组内分别列出，因此各大组人数之和不等于总人数。第二页人员分配尚未按本次技术组变动调整。",
+  "人数按统计范围内的实际人员计算；跨组兼任会在相应组内分别列出，因此各大组人数之和不等于总人数。两页人员差异见[第二页名单对照](RM2027-第二页名单对照.md)。",
   "",
   "| 组别 | 大三 | 大二 | 人数 |",
   "| --- | ---: | ---: | ---: |",
@@ -67,3 +67,47 @@ for (const [extension, content] of [["md", lines.join("\n")], ["txt", text.join(
   await writeFile(file, content, "utf8");
   console.log(fileURLToPath(file));
 }
+
+// 同步生成两页对照，避免人员分配更新后仍保留旧的待分配名单。
+const cars = JSON.parse(await readFile(new URL("public/data/cars.json", root), "utf8"));
+const carPeople = new Map();
+const gradeLabels = { "2024级": "大三", "2025级": "大二" };
+let assignments = 0;
+function addCarPerson(name, grade, role) {
+  const person = carPeople.get(name) ?? { name, grades: new Set(), roles: [] };
+  if (grade) person.grades.add(grade);
+  person.roles.push(role);
+  carPeople.set(name, person);
+  assignments += 1;
+}
+for (const robot of cars.robots) {
+  for (const [grade, disciplines] of Object.entries(robot.crew)) {
+    for (const [discipline, names] of Object.entries(disciplines)) {
+      for (const name of names) addCarPerson(name, gradeLabels[grade] ?? grade, `${robot.name}／${discipline}`);
+    }
+  }
+}
+for (const robot of cars.robots) {
+  const leads = Array.isArray(robot.lead) ? robot.lead : robot.lead ? [robot.lead] : [];
+  for (const name of leads) addCarPerson(name, people.get(name)?.grade, `${robot.name}／负责人`);
+}
+const missing = [...people.values()].filter(person => !carPeople.has(person.name));
+const extra = [...carPeople.values()].filter(person => !people.has(person.name));
+const shared = [...people.keys()].filter(name => carPeople.has(name)).length;
+const comparison = [
+  "# RM2027 第二页名单对照", "",
+  `第二页现有 **${carPeople.size} 人、${assignments} 人次、${cars.robots.length} 个车组**。人次按每台车的工作与负责人任务累计，合并显示不减少人次。`, "",
+  `第一页 ${people.size} 人，两页共有 ${shared} 人；第一页独有 ${missing.length} 人，第二页独有 ${extra.length} 人。`, "",
+  `## 第一页有、第二页尚未出现的 ${missing.length} 人`, "",
+  "| 姓名 | 年级 | 第一页所属组别 |", "| --- | --- | --- |",
+  ...missing.map(person => `| ${person.name} | ${person.grade} | ${person.roles.join("；")} |`), "",
+  `## 第二页有、第一页尚未出现的 ${extra.length} 人`, "",
+  "| 姓名 | 年级 | 当前车组任务 |", "| --- | --- | --- |",
+  ...extra.map(person => `| ${person.name} | ${[...person.grades].join("／") || "待确认"} | ${person.roles.join("；")} |`), "",
+  "## 当前负责人", "", "| 车组 | 负责人 |", "| --- | --- |",
+  ...cars.robots.map(robot => `| ${robot.name} | ${Array.isArray(robot.lead) ? robot.lead.join("、") : robot.lead || "未指定"} |`), "",
+  "数据来源：`public/data/tech.json`、`public/data/cars.json`。运行 `pnpm export:roster` 更新本对照。", "",
+];
+const comparisonFile = new URL("RM2027-第二页名单对照.md", output);
+await writeFile(comparisonFile, comparison.join("\n"), "utf8");
+console.log(fileURLToPath(comparisonFile));

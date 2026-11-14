@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import type { CarStats, CarsData } from "../data/roster";
 import { CONTENT_W } from "../lib/util";
+import { carCellRuns } from "../lib/car-cells";
 import { AccentLabel, Block, PersonCell } from "./blocks";
 import { Countdown } from "./Countdown";
 import { PosterFooter } from "./PosterFooter";
@@ -159,18 +160,14 @@ export function CarMatrix({ data, stats }: { data: CarsData; stats: CarStats }) 
                       >
                         <AccentLabel accent={disc.accent}>{disc.name}</AccentLabel>
                       </Block>
-                      {robots.map((robot, ci) => {
-                        const list = robot.crew[grade]?.[disc.name];
-                        if (!list?.length) return null;
-                        return (
+                      {carCellRuns(robots, robot => robot.crew[grade]?.[disc.name] ?? []).map(run => (
                           <PersonCell
-                            key={`${grade}-${disc.name}-${robot.name}`}
-                            names={list}
+                            key={`${grade}-${disc.name}-${run.start}`}
+                            names={run.names}
                             accent={disc.accent}
-                            style={{ gridColumn: ci + 3, gridRow: rowIndex }}
+                            style={{ gridColumn: `${run.start + 3} / span ${run.span}`, gridRow: rowIndex }}
                           />
-                        );
-                      })}
+                      ))}
                     </Fragment>
                   );
                 })}
@@ -178,7 +175,7 @@ export function CarMatrix({ data, stats }: { data: CarsData; stats: CarStats }) 
             );
           })}
 
-          {/* 负责人行：末行，每台车各写自己的负责人 */}
+          {/* 相邻项目负责人相同时，合并显示一次。 */}
           <Block
             style={{
               gridColumn: "1 / span 2",
@@ -189,17 +186,14 @@ export function CarMatrix({ data, stats }: { data: CarsData; stats: CarStats }) 
           >
             {leadRow.label}
           </Block>
-          {robots.map((robot, ci) => {
-            if (!robot.lead.length) return null;
-            return (
+          {carCellRuns(robots, robot => robot.lead).map(run => (
               <PersonCell
-                key={`lead-${robot.name}`}
-                names={robot.lead}
+                key={`lead-${run.start}`}
+                names={run.names}
                 accent={leadRow.accent}
-                style={{ gridColumn: ci + 3, gridRow: totalRows }}
+                style={{ gridColumn: `${run.start + 3} / span ${run.span}`, gridRow: totalRows }}
               />
-            );
-          })}
+          ))}
         </div>
       </section>
 
