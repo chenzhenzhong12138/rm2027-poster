@@ -121,10 +121,15 @@ body {
   border-radius: var(--radius-bar);
 }
 
-/* 第一页：双子组上下等分，年级行按真实名单高度排版，不挤占相邻子组。 */
+/* 第一页：四卡统一起点、子组层高和年级基线，姓名使用同一字号。 */
+.tech-card {
+  --text-body: 20px;
+}
+
 .tech-card-head {
-  flex: 0 0 88px;
-  padding: 16px 20px;
+  flex: 0 0 84px;
+  min-height: 84px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--color-hair);
 }
 
@@ -132,8 +137,8 @@ body {
   display: grid;
   flex: 1;
   min-height: 0;
-  gap: 24px;
-  padding: 20px 18px;
+  gap: 20px;
+  padding: 18px;
 }
 
 .tech-sub {
@@ -147,7 +152,7 @@ body {
 .tech-sub + .tech-sub::before {
   position: absolute;
   content: "";
-  top: -12px;
+  top: -10px;
   left: 0;
   right: 0;
   border-top: 1px solid var(--color-hair);
@@ -157,14 +162,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 26px;
-  margin-bottom: 12px;
+  height: 22px;
+  margin-bottom: 10px;
 }
 
 .tech-sub-grades {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .tech-grade {
@@ -177,15 +182,9 @@ body {
   display: flex;
   flex: 0 0 42px;
   align-items: center;
-  height: 45.2px;
+  height: 40px;
 }
 
-.tech-sub-single {
-  display: flex;
-  align-items: center;
-}
-
-.tech-sub-single .tech-sub-grades {
-  width: 100%;
-  gap: 44px;
+.tech-grade[data-gradeline="大三"] {
+  min-height: 88px; /* 两行 40px 姓名 + 8px 间距，四卡的大二在同一 y 起排。 */
 }

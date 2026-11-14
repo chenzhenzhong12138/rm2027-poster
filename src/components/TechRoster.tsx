@@ -29,13 +29,13 @@ function SubBlock({ sub, group, boxWidth }: {
 }) {
     const single = group.subs.length === 1 && sub.name === group.name;
     return (
-        <div className={`tech-sub ${single ? "tech-sub-single" : ""}`} data-sub={sub.name}>
-            {!single && (
-                <div className="tech-sub-title">
+        <div className="tech-sub" data-sub={sub.name}>
+            <div className="tech-sub-title" aria-hidden={single || undefined}>
+                {!single && <>
                     <AccentLabel accent={group.accent}>{sub.name}</AccentLabel>
                     <span className="text-meta tracking-[0.5px] text-dim">{sub.g3.length + sub.g2.length} 人</span>
-                </div>
-            )}
+                </>}
+            </div>
             <div className="tech-sub-grades">
                 <ChipLine grade="大三" names={sub.g3} strong boxWidth={boxWidth} />
                 <ChipLine grade="大二" names={sub.g2} strong={false} boxWidth={boxWidth} />
@@ -54,13 +54,13 @@ function TechCard({ group }: { group: TechGroup }) {
             style={{ flex: `0 0 ${group.width}px`, borderColor: group.border }}
         >
             <header className="tech-card-head" style={{ background: group.accent }}>
-                <div className="flex items-center justify-between gap-[12px]">
+                <div className="flex items-center justify-between gap-[12px] leading-[1.1]">
                     <span className="text-cardtitle font-bold tracking-[3px] text-white">{group.name}</span>
                     <span className="whitespace-nowrap text-cardtitle font-bold text-white" data-group-total>
                         {g3 + g2}<span className="ml-[5px] text-meta font-medium">人</span>
                     </span>
                 </div>
-                <div className="mt-[8px] text-meta tracking-[1px] text-white/85">大三 {g3} · 大二 {g2}</div>
+                <div className="mt-[6px] text-meta leading-[1.25] tracking-[1px] text-white/85">大三 {g3} · 大二 {g2}</div>
             </header>
             <div className="tech-card-body" style={{ gridTemplateRows: `repeat(${group.subs.length}, minmax(0, 1fr))` }}>
                 {group.subs.map(sub => <SubBlock key={sub.name} sub={sub} group={group} boxWidth={boxWidth} />)}
