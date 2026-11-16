@@ -24,7 +24,7 @@
 
 | 技术组名单 | 车组名单 |
 | --- | --- |
-| ![技术组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/c9e9c65e3629c7ec960f96af45c5b991ee8190f9/shots/tech-1920x1080.png) | ![车组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/133a00796bf748cd91147a8b56da39f21b9f9874/shots/cars-1920x1080.png) |
+| ![技术组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/c9e9c65e3629c7ec960f96af45c5b991ee8190f9/shots/tech-1920x1080.png) | ![车组名单](https://raw.githubusercontent.com/chenzhenzhong12138/rm2027-poster/d877233764d479a956f4ea3368d1d552dbf39d9c/shots/cars-1920x1080.png) |
 
 <!-- 预览图使用固定提交链接，避免同名文件的旧缓存；更新 shots/ 后须同步刷新以上提交号。 -->
 
